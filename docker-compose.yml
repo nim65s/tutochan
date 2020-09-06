@@ -1,0 +1,69 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:11-alpine
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - "${CHATONS_ROOT_DIR:-/srv/chatons}/tutochan/sql:/var/lib/postgresql/data"
+  memcached:
+    image: memcached:alpine
+    restart: unless-stopped
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+  gunicorn:
+    build: .
+    command: ./entrypoint.sh gunicorn
+    restart: unless-stopped
+    volumes:
+      - "${CHATONS_ROOT_DIR:-/srv/chatons}/tutochan/srv:/srv"
+    env_file:
+      - .env
+    environment:
+      - DB=postgres
+      - MEMCACHED=True
+    networks:
+      - web
+      - default
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.tutochan-gunicorn.rule: "Host(`tutochan.${DOMAIN_NAME:-localhost}`)"
+  daphne:
+    build: .
+    command: ./entrypoint.sh daphne
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - DB=postgres
+      - MEMCACHED=True
+    networks:
+      - web
+      - default
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.tutochan-daphne.rule: "Host(`tutochan.${DOMAIN_NAME:-localhost}`) && PathPrefix(`/ws`)"
+  nginx:
+    image: nim65s/ndh:nginx
+    restart: unless-stopped
+    volumes:
+      - "${CHATONS_ROOT_DIR:-/srv/chatons}/tutochan/srv/tutochan:/srv:ro"
+    networks:
+      - web
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.tutochan-nginx.rule: "Host(`tutochan.${DOMAIN_NAME:-localhost}`) && PathPrefix(`/static`, `/media`)"
+  test:
+    build: .
+    command: ./entrypoint.sh test
+    env_file:
+      - .env
+  selenium:
+    image: selenium/standalone-firefox
+
+networks:
+  web:
+    external: true
