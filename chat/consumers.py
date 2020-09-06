@@ -57,6 +57,6 @@ class ServerSentEventsConsumer(AsyncHttpConsumer):
             (b'Transfer-Encoding', b'chunked'),
         ])
         while True:
-            payload = 'data: %s\n\n' % datetime.now().isoformat()
+            payload = f'data: {datetime.now():%x %X}\n\n'
             await self.send_body(payload.encode('utf-8'), more_body=True)
             await asyncio.sleep(1)
