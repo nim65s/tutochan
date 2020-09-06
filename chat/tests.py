@@ -20,7 +20,7 @@ class ChatTests(ChannelsLiveServerTestCase):
         try:
             command_executor = "http://selenium:4444/wd/hub"
             cls.driver = webdriver.Remote(command_executor, webdriver.DesiredCapabilities.FIREFOX)
-        except:
+        except Exception:
             super().tearDownClass()
             raise
 
