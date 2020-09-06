@@ -1,0 +1,9 @@
+{% extends 'ndh.html' %}
+{% load ndh %}
+
+{% block pagetitle %}Tuto Chan - {% block title %}{{ title }}{% endblock %}{% endblock %}
+{% block sitetitle %}TutoChan{% endblock %}
+
+{% block navbarleft %}
+{% navbar_item 'chat:index' 'Chat' %}
+{% endblock %}

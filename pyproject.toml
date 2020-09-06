@@ -13,6 +13,7 @@ psycopg2 = "^2.8.5"
 python-memcached = "^1.59"
 requests = "^2.24.0"
 gunicorn = "^20.0.4"
+ndh = "^3.10.4"
 
 [tool.poetry.dev-dependencies]
 ipython = "^7.18.1"
