@@ -1,9 +1,7 @@
-import json
-
-from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 
-class ChatConsumer(AsyncWebsocketConsumer):
+class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         # print(f'{self.scope=}')
         # print(f'{self.channel_name=}')
@@ -15,10 +13,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
-    async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json['message']
-        await self.channel_layer.group_send(self.room_group_name, {'type': 'chati_message', 'message': message})
+    async def receive_json(self, content):
+        await self.channel_layer.group_send(self.room_group_name, {
+            'type': 'chati_message',
+            'message': content['message']
+        })
 
     async def chati_message(self, event):
-        await self.send(text_data=json.dumps({'message': event['message']}))
+        await self.send_json(content={'message': event['message']})
