@@ -10,7 +10,7 @@ jobs:
           docker network create web
           echo SECRET_KEY=secret_key >> .env
           echo POSTGRES_PASSWORD=postgres_password >> .env
-          docker-compose up --build --exit-code-from test
+          docker-compose up --build --exit-code-from test test
   lint:
     runs-on: ubuntu-latest
     steps:

@@ -16,5 +16,5 @@ docker-compose up -d --build daphne
 ## Start the tests
 
 ```bash
-docker-compose up --build --exit-code-from test
+docker-compose up --build --exit-code-from test test
 ```
