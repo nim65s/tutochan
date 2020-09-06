@@ -31,6 +31,11 @@ services:
     labels:
       traefik.enable: "true"
       traefik.http.routers.tutochan-gunicorn.rule: "Host(`tutochan.${DOMAIN_NAME:-localhost}`)"
+    depends_on:
+      - postgres
+      - memcached
+      - redis
+      - nginx
   daphne:
     build: .
     command: ./entrypoint.sh daphne
@@ -46,6 +51,8 @@ services:
     labels:
       traefik.enable: "true"
       traefik.http.routers.tutochan-daphne.rule: "Host(`tutochan.${DOMAIN_NAME:-localhost}`) && PathPrefix(`/ws`)"
+    depends_on:
+      - gunicorn
   nginx:
     image: nim65s/ndh:nginx
     restart: unless-stopped
@@ -56,13 +63,17 @@ services:
     labels:
       traefik.enable: "true"
       traefik.http.routers.tutochan-nginx.rule: "Host(`tutochan.${DOMAIN_NAME:-localhost}`) && PathPrefix(`/static`, `/media`)"
+  selenium:
+    image: selenium/standalone-firefox
   test:
     build: .
     command: ./entrypoint.sh test
     env_file:
       - .env
-  selenium:
-    image: selenium/standalone-firefox
+    depends_on:
+      - selenium
+      - postgres
+      - redis
 
 networks:
   web:
