@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "tutochan"
+version = "0.1.0"
+description = "Following channels tuto."
+authors = ["Guilhem Saurel <guilhem.saurel@laas.fr>"]
+license = "BSD-2-Clause"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+channels = "^2.4.0"
+
+[tool.poetry.dev-dependencies]
+ipython = "^7.18.1"
+flake8 = "^3.8.3"
+yapf = "^0.30.0"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
