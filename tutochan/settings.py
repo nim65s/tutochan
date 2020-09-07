@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'channels',
     'chat',
     'bootstrap4',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -133,3 +134,5 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+REST_FRAMEWORK = {'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly']}
