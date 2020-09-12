@@ -5,10 +5,10 @@
   "background_color": "#3f4040",
   "display": "browser",
   "scope": "/",
-  "start_url": "/"
+  "start_url": "/",
   "icons": [
   {
-    "src": "/images/icon-144.png",
+    "src": "static/images/icon-144.png",
     "sizes": "144x144",
     "type": "image/png"
   }

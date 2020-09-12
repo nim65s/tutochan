@@ -24,11 +24,15 @@
 
   async function loadEntries(page = 1) {
     const [chans, posts, users] = await Promise.all([getChans(), getPosts(page), getUsers()]);
-    return posts.map(post => {
-      const chan = chans.filter(c => c.url === post.chan)[0];
-      const user = users.filter(u => u.url === post.user)[0];
-      return `<div class="row"><div class="col">${chan.name}</div><div class="col">${post.created}</div><div class="col">${user.username}</div><div class="col-6">${post.message}</div></div>`;
-    }).join('');
+    if (posts.results) {
+      return posts.results.map(post => {
+        const chan = chans.results.filter(c => c.url === post.chan)[0];
+        const user = users.results.filter(u => u.url === post.user)[0];
+        return `<div class="row"><div class="col">${chan.name}</div><div class="col">${post.created}</div><div class="col">${user.username}</div><div class="col-6">${post.message}</div></div>`;
+      }).join('');
+    } else {
+      return '';
+    }
   }
 
   function appendEntries(entries) {
