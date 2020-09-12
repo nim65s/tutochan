@@ -2,37 +2,31 @@
   const app = document.querySelector('#app');
   const container = app.querySelector('.entry-container');
   const loadMore = app.querySelector('.load-more');
-  const addBtn = app.querySelector('.add-button');
-  addBtn.style.display = 'none';
-  let deferredPrompt;
+
+  let JSONCache = {}; // url: dict
+
+  async function fetchJSON(url) {
+    if (!(url in JSONCache)) {
+      const resp = await fetch(url);
+      const ret = await resp.json();
+      JSONCache[url] = ret;
+    }
+    return JSONCache[url];
+  }
 
   async function getPosts(page = 1) {
-    const result = await fetch(window.location.origin + '/api/messages/?page=' + page);
-    return await result.json();
+    return await fetchJSON(window.location.origin + '/api/messages/?page=' + page);
   }
-
-  async function getChans() {
-    const result = await fetch(window.location.origin + '/api/chans/');
-    return await result.json();
-  }
-
-  async function getUsers() {
-    const result = await fetch(window.location.origin + '/api/users/');
-    return await result.json();
-  }
-
 
   async function loadEntries(page = 1) {
-    const [chans, posts, users] = await Promise.all([getChans(), getPosts(page), getUsers()]);
-    if (posts.results) {
-      return posts.results.map(post => {
-        const chan = chans.results.filter(c => c.url === post.chan)[0];
-        const user = users.results.filter(u => u.url === post.user)[0];
-        return `<div class="row"><div class="col">${chan.name}</div><div class="col">${post.created}</div><div class="col">${user.username}</div><div class="col-6">${post.message}</div></div>`;
-      }).join('');
-    } else {
-      return '';
+    let entries = [];
+    const posts = await getPosts(page);
+    for (i in posts.results) {
+      const post = posts.results[i];
+      const [chan, user] = await Promise.all([fetchJSON(post.chan), fetchJSON(post.user)]);
+      entries.push(`<div class="row"><div class="col">${chan.name}</div><div class="col">${post.created}</div><div class="col">${user.username}</div><div class="col-6">${post.message}</div></div>`);
     }
+    return entries.join('');
   }
 
   function appendEntries(entries) {
@@ -60,54 +54,19 @@ window.addEventListener('beforeinstallprompt', e => {
   e.prompt();
 });
 
-if ('serviceWorker' in navigator) {
-  try {
-    registerServiceWorker();
-  } catch (e) {
-    console.error('register service worker failed', e);
-  }
-} else {
-  console.error('no support of pwa');
+// Register service worker to control making site work offline
+
+if('serviceWorker' in navigator) {
+  navigator.serviceWorker
+           .register('static/sw.js')
+           .then(function() { console.log('Service Worker Registered'); });
 }
 
-async function registerServiceWorker() {
-  try {
-    const registration = await navigator.serviceWorker.register('static/sw.js');
-    console.log('ServiceWorker ok');
-  } catch (e) {
-    console.error('ServiceWorker failed', e);
-  }
-}
+// Code to handle install prompt on desktop
 
-const files = [
-  'static/',
-  'static/index.js',
-];
-
-self.addEventListener('install', async e => {
-  const cache = await caches.open('files');
-  cache.addAll(files);
-});
-
-self.addEventListener('fetch', async e => {
-  const req = e.request;
-  const res = isApiCall(req) ? getFromNetwork(req) : getFromCache(req);
-  await e.respondWith(res);
-});
-
-async function getFromNetwork(req) {
-  const cache = await caches.open('data');
-
-  try {
-    const res = await fetch(req);
-    cache.put(req, res.clone());
-    return res;
-  } catch (e) {
-    const res = await cache.match(req);
-    return res || getFallback(req);
-  }
-}
-
+let deferredPrompt;
+const addBtn = document.querySelector('.add-button');
+addBtn.style.display = 'none';
 
 window.addEventListener('beforeinstallprompt', (e) => {
   // Prevent Chrome 67 and earlier from automatically showing the prompt

@@ -1,16 +1,17 @@
 {
-  "name": "Tuto Chan",
-  "short_name": "tutochan",
-  "theme_color": "#dcdccc",
-  "background_color": "#3f4040",
-  "display": "browser",
-  "scope": "/",
-  "start_url": "/",
-  "icons": [
-  {
-    "src": "static/images/icon-144.png",
-    "sizes": "144x144",
-    "type": "image/png"
-  }
-]
+    "name": "Tuto Chan",
+    "short_name": "tutochan",
+    "theme_color": "#dcdccc",
+    "background_color": "#3f4040",
+    "description": "play with PWA and Django Channels",
+    "display": "fullscreen",
+    "scope": "/",
+    "start_url": "/",
+    "icons": [
+        {
+            "src": "static/images/icon-144.png",
+            "sizes": "144x144",
+            "type": "image/png"
+        }
+    ]
 }
